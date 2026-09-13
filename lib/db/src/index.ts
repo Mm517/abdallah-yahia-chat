@@ -4,9 +4,11 @@ import * as schema from "./schema";
 
 const { Pool } = pg;
 
-if (!process.env.DATABASE_URL) {
+const databaseUrl = process.env.SUPABASE_DB_URL ?? process.env.DATABASE_URL;
+
+if (!databaseUrl) {
   throw new Error(
-    "DATABASE_URL must be set — use the Supabase project's connection string " +
+    "SUPABASE_DB_URL must be set — use the Supabase project's connection string " +
       "(Project Settings → Database → Connection string, pooled 'Transaction' " +
       "mode for serverless, or the direct connection for a long-lived server).",
   );
@@ -14,7 +16,7 @@ if (!process.env.DATABASE_URL) {
 
 // Supabase's Postgres always requires TLS.
 export const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: databaseUrl,
   ssl: { rejectUnauthorized: false },
 });
 export const db = drizzle(pool, { schema });
